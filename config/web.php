@@ -43,6 +43,29 @@ $config = [
             ],
         ],
         'db' => $db,
+            // ...
+            'i18n' => [
+                'translations' => [
+                    'app*' => [
+                        'class' => 'yii\i18n\PhpMessageSource',
+                        //'basePath' => '@app/messages',
+                        //'sourceLanguage' => 'en-US',
+                        'fileMap' => [
+                            'app' => 'app.php',
+                            
+                        ],
+                    ],
+                ],
+            ],
+            'urlManager' => [
+                'class' => 'codemix\localeurls\UrlManager',
+    
+                // List all supported languages here
+                // Make sure, you include your app's default language.
+                'languages' => ['en', 'de', 'ru'],
+            ]
+    
+        
         /*
         'urlManager' => [
             'enablePrettyUrl' => true,

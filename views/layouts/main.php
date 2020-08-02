@@ -1,4 +1,65 @@
 <?php
+use yii\bootstrap\Dropdown;
+
+class LanguageDropdown extends Dropdown
+{
+    private static $_labels;
+
+    private $_isError;
+
+    public function init()
+    {
+        $route = Yii::$app->controller->route;
+        $appLanguage = Yii::$app->language;
+        $params = $_GET;
+        $this->_isError = $route === Yii::$app->errorHandler->errorAction;
+
+        array_unshift($params, '/' . $route);
+
+        foreach (Yii::$app->urlManager->languages as $language) {
+            $isWildcard = substr($language, -2) === '-*';
+            if (
+                $language === $appLanguage ||
+                // Also check for wildcard language
+                $isWildcard && substr($appLanguage, 0, 2) === substr($language, 0, 2)
+            ) {
+                continue;   // Exclude the current language
+            }
+            if ($isWildcard) {
+                $language = substr($language, 0, 2);
+            }
+            $params['language'] = $language;
+            $this->items[] = [
+                'label' => self::label($language),
+                'url' => $params,
+            ];
+        }
+        parent::init();
+    }
+
+    public function run()
+    {
+        // Only show this widget if we're not on the error page
+        if ($this->_isError) {
+            return '';
+        } else {
+            return parent::run();
+        }
+    }
+
+    public static function label($code)
+    {
+        if (self::$_labels === null) {
+            self::$_labels = [
+                'de' => 'Deutch',
+                'en' => 'English',
+                'ru' => 'Русский',
+            ];
+        }
+
+        return isset(self::$_labels[$code]) ? self::$_labels[$code] : null;
+    }
+}
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -38,11 +99,11 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
+            ['label' => Yii::t('app', 'Home'), 'url' => ['/site/index']],
+            ['label' => Yii::t('app', 'About'), 'url' => ['/site/about']],
+            ['label' => Yii::t('app', 'Contact'), 'url' => ['/site/contact']],
             Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/site/login']]
+                ['label' => Yii::t('app', 'Login'), 'url' => ['/site/login']]
             ) : (
                 '<li>'
                 . Html::beginForm(['/site/logout'], 'post')
@@ -52,17 +113,23 @@ AppAsset::register($this);
                 )
                 . Html::endForm()
                 . '</li>'
-            )
+                ),
+                ['label'=>LanguageDropdown::label(Yii::$app->language), 'items' =>LanguageDropdown::widget()]
         ],
     ]);
     NavBar::end();
     ?>
 
     <div class="container">
-        <?= Breadcrumbs::widget([
+    <?= Breadcrumbs::widget([
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
         ]) ?>
-        <?= Alert::widget() ?>
+        <?php if(!empty(Yii::$app->session->getFlash('success'))): ?>
+            <div class="alert alert-success alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <?= Yii::$app->session->getFlash('success') ?>
+            </div>
+        <?php endif; ?>
         <?= $content ?>
     </div>
 </div>
