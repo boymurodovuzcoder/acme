@@ -1,5 +1,8 @@
 <?php
-
+    
+    use yii\bootstrap\Dropdown;
+    
+    
 /* @var $this yii\web\View */
 
 $this->title = 'My Yii Application';
@@ -7,11 +10,11 @@ $this->title = 'My Yii Application';
 <div class="site-index">
 
     <div class="jumbotron">
-        <h1>Congratulations!</h1>
+        <h1><?= Yii::t('app', 'Congratulations!'); ?>{<?= Yii::$app->language ?>}</h1>
 
-        <p class="lead">You've successfully created your Yii-powered application.</p>
+        <p class="lead"><?=Yii::t('app', 'You have successfully created your Yii-powered application.')?></p>
 
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
+        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com"><?=Yii::t('app', 'Get started with Yii')?></a></p>
     </div>
 
     <div class="body-content">
